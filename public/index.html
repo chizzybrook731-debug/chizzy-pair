@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head><title>Chizzy-Bot Pairing</title></head>
-<body style="text-align:center; font-family:sans-serif;">
+<body style="text-align:center; font-family:sans-serif; padding:50px">
 <h1>🔥 CHIZZY-BOT PAIRING 🔥</h1>
 <input id="num" placeholder="263777984650">
 <button onclick="pair()">Get Code</button>
 <h2 id="code"></h2>
 <script>
 async function pair(){
-  const num = document.getElementById('num').value;
-  const res = await fetch('/pair',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({number:num})});
-  const data = await res.json();
-  document.getElementById('code').innerText = "CODE: " + data.code;
+ const num = document.getElementById('num').value;
+ const res = await fetch('/pair',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({number:num})});
+ const data = await res.json();
+ document.getElementById('code').innerText = "CODE: " + data.code;
 }
 </script>
 </body>

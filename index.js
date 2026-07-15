@@ -1,18 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head><title>Chizzy-Bot Pairing</title></head>
-<body style="text-align:center; font-family:sans-serif;">
-<h1>🔥 CHIZZY-BOT PAIRING 🔥</h1>
-<input id="num" placeholder="263777984650">
-<button onclick="pair()">Get Code</button>
-<h2 id="code"></h2>
-<script>
-async function pair(){
-  const num = document.getElementById('num').value;
-  const res = await fetch('/pair',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({number:num})});
-  const data = await res.json();
-  document.getElementById('code').innerText = "CODE: " + data.code;
-}
-</script>
-</body>
-</html>
+const express = require('express');
+const path = require('path');
+const app = express();
+
+app.use(express.json());
+app.use(express.static('public'));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.post('/pair', (req, res) => {
+  res.json({ code: "TEMP-CODE-123" });
+});
+
+module.exports = app;
