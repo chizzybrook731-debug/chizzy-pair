@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
-const { default: makeWASocket, useMultiFileAuthState, delay } = require('@whiskeysockets/baileys');
+const pino = require('pino');
+const { default: makeWASocket, useMultiFileAuthState, Browsers, delay } = require('@whiskeysockets/baileys');
+const fs = require('fs');
 const app = express();
 
 app.use(express.json());
@@ -11,20 +13,29 @@ app.get('/', (req, res) => {
 });
 
 app.post('/pair', async (req, res) => {
-  const { number } = req.body;
-  const { state, saveCreds } = await useMultiFileAuthState('./auth');
-  
-  const sock = makeWASocket({
-    auth: state,
-    printQRInTerminal: false
-  });
-  
-  sock.ev.on('creds.update', saveCreds);
-  
-  await delay(2000);
-  const code = await sock.requestPairingCode(number);
-  
-  res.json({ code: code });
+  try {
+    const { number } = req.body;
+    const sessionId = "session_" + Date.now();
+    const { state, saveCreds } = await useMultiFileAuthState(sessionId);
+    
+    const sock = makeWASocket({
+      auth: state,
+      logger: pino({ level: 'silent' }),
+      browser: Browsers.macOS("Chrome")
+    });
+    
+    sock.ev.on('creds.update', saveCreds);
+    
+    await delay(3000);
+    const code = await sock.requestPairingCode(number);
+    
+    await sock.logout();
+    fs.rmSync(sessionId, { recursive: true, force: true });
+    
+    res.json({ code: code });
+  } catch (e) {
+    res.json({ code: "ERROR: " + e.message });
+  }
 });
 
 module.exports = app;
